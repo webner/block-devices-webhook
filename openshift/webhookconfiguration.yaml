@@ -1,0 +1,22 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: block-devices-webhook
+webhooks:
+- name: block-devices-webhook.svc.cluster
+  clientConfig:
+    service:
+      name: block-devices-webhook
+      namespace: block-devices-webhook
+      path: "/mutate"
+    caBundle: $CERT
+  rules:
+  - operations: [ "CREATE" ]
+    apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["pods"]
+  namespaceSelector:
+    matchExpressions:
+    - operator: NotIn
+      key: block-devices-enabled
+      values: ['false']
